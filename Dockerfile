@@ -1,6 +1,10 @@
+# Base image
 FROM node:14-alpine
-RUN adduser -S app
-RUN mkdir /bootcamp
-WORKDIR /bootcamp
-RUN echo ASASDASDASDSAD
 
+COPY . /bootcamp-app
+WORKDIR /bootcamp-app
+EXPOSE 8080
+
+# Install dependencies
+RUN npm install 
+CMD npm run initdb && npm run dev
