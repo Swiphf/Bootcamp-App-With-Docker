@@ -62,4 +62,4 @@ stages:
           - task: CmdLine@2
             displayName: Run New Container
             inputs:
-              script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry):$(tag)'
+              script: 'docker run -d --name weighttracker -p 8080:8080 containerregistryweek9.azurecr.io/weighttracker:$(tag)'
