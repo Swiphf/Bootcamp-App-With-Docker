@@ -1,69 +1,11 @@
-# trigger:
-# - master
-
-# pool:
-#   vmImage: ubuntu-latest
-
-# resources:
-# - repo: self
-
-# variables:
-#   # Container registry service connection established during pipeline creation
-#   dockerRegistryServiceConnection: '3d650e2f-60c2-4d0f-9bd0-4927698d554d'
-#   imageRepository: 'swiphfbootcampappwithdocker'
-#   containerRegistry: 'weighttracker.azurecr.io'
-#   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-#   tag: 'run_number_$(Build.BuildId)'
-
-#   # Agent VM image name
-#   vmImageName: 'ubuntu-latest'
-
-# stages:
-# - stage: Build
-#   displayName: Build and push stage
-#   jobs:
-#   - job: Build
-#     displayName: Build
-#     steps:
-#     - task: Docker@2
-#       displayName: Build and push an image to container registry
-#       inputs:
-#         command: buildAndPush
-#         repository: $(imageRepository)
-#         dockerfile: $(dockerfilePath)
-#         containerRegistry: $(dockerRegistryServiceConnection)
-#         tags: |
-#           $(tag)
-
-# - stage: DeployToStaging
-#   jobs:
-#   - deployment: staging
-#     displayName: Deploy to Staging
-#     workspace:
-#       clean: all
-#     environment:
-#       name: staging
-#       resourceType: VirtualMachine
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
-#           - script: echo "TESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTING
-
-
-
-
-
-
-name: 'idoalon'
-
 trigger:
 - master
-- feature/*
 
 pool:
   vmImage: ubuntu-latest
-  name: bootcamp-pool-week9
+
+resources:
+- repo: self
 
 variables:
   # Container registry service connection established during pipeline creation
@@ -71,64 +13,39 @@ variables:
   imageRepository: 'swiphfbootcampappwithdocker'
   containerRegistry: 'weighttracker.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
-  serviceName: cicd
+  tag: 'run_number_$(Build.BuildId)'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
 
 stages:
-
-# Continuous Integration Process
-- stage: CI
+- stage: Build
+  displayName: Build and push stage
   jobs:
-  - job: BuildAndPushDocker
-    workspace: 
-      clean: all
+  - job: Build
+    displayName: Build
     steps:
-    - task: Docker@0
-      displayName: 'Build docker image'
-      inputs:
-        dockerRegistryEndpoint: 'weighttracker'
-        action: Build an image
-        dockerfile: $(dockerfilePath)
-        imageName: weighttracker.azurecr.io/$(serviceName):$(tag)
     - task: Docker@2
-      displayName: Login to Registry
-      inputs: 
-        containerRegistry: 'weighttracker'
-        command: login
-    - task: Docker@0
-      displayName: 'Push Docker Image'
+      displayName: Build and push an image to container registry
       inputs:
-        dockerRegistryEndpoint: 'weighttracker'
-        action: Push an image
-        imageName: weighttracker.azurecr.io/$(serviceName):$(tag)
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
 
-# # Continuous Deployment Process for Staging Environment
-# - stage: DeployToStaging
-#   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
-#   jobs:
-#   - deployment: staging
-#     displayName: Deploy to Staging
-#     environment:
-#       name: <<YOUR ENVIRONMENT NAME>>
-#       resourceType: VirtualMachine
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
-#           - <<YOUR TASKS>>
-          
-# # Continuous Delivery Process for Production Environment
-# - stage: DeployToProduction
-#   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
-#   jobs:
-#   - deployment: production
-#     displayName: Deploy to Production
-#     environment:
-#       name: <<YOUR ENVIRONMENT NAME>>
-#       resourceType: VirtualMachine
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
-#           - <<YOUR TASKS>>
-
+- stage: DeployToStaging
+  jobs:
+  - deployment: staging
+    displayName: Deploy to Staging
+    workspace:
+      clean: all
+    environment:
+      name: staging
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo "TESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTING
