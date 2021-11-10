@@ -62,6 +62,7 @@ trigger:
 - feature/*
 
 pool:
+  name: bootcamp-pool-week9
   vmImage: ubuntu-latest
 
 stages:
