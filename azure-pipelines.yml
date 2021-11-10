@@ -35,3 +35,31 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+# CD staging
+- stage: DeployToStaging
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: staging
+    displayName: Deploy to Staging
+    environment:
+      name: staging
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: CmdLine@2
+            displayName: Stop Current Container
+            inputs:
+              script: 'docker rm -f  weighttracker || true'
+          - task: Docker@2
+            displayName: 'Login to Registry'
+            inputs:
+              containerRegistry: $(containerRegistry)
+              command: 'login'
+
+          # - task: CmdLine@2
+          #   displayName: Run New Container
+          #   inputs:
+          #     script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry).azurecr.io/weighttracker:$(tag)'
