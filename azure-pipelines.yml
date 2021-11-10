@@ -22,7 +22,7 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      name: bootcamp-pool
+      name: bootcamp-pool-week9
       vmImage: $(vmImageName)
     steps:
     - task: Docker@2
