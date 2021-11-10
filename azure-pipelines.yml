@@ -39,6 +39,8 @@ stages:
   jobs:
   - deployment: staging
     displayName: Deploy to Staging
+    workspace:
+      clean: all
     environment:
       name: staging
       resourceType: VirtualMachine
