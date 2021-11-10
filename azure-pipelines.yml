@@ -1,28 +1,77 @@
+# trigger:
+# - master
+
+# pool:
+#   vmImage: ubuntu-latest
+
+# resources:
+# - repo: self
+
+# variables:
+#   # Container registry service connection established during pipeline creation
+#   dockerRegistryServiceConnection: '3d650e2f-60c2-4d0f-9bd0-4927698d554d'
+#   imageRepository: 'swiphfbootcampappwithdocker'
+#   containerRegistry: 'weighttracker.azurecr.io'
+#   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+#   tag: 'run_number_$(Build.BuildId)'
+
+#   # Agent VM image name
+#   vmImageName: 'ubuntu-latest'
+
+# stages:
+# - stage: Build
+#   displayName: Build and push stage
+#   jobs:
+#   - job: Build
+#     displayName: Build
+#     steps:
+#     - task: Docker@2
+#       displayName: Build and push an image to container registry
+#       inputs:
+#         command: buildAndPush
+#         repository: $(imageRepository)
+#         dockerfile: $(dockerfilePath)
+#         containerRegistry: $(dockerRegistryServiceConnection)
+#         tags: |
+#           $(tag)
+
+# - stage: DeployToStaging
+#   jobs:
+#   - deployment: staging
+#     displayName: Deploy to Staging
+#     workspace:
+#       clean: all
+#     environment:
+#       name: staging
+#       resourceType: VirtualMachine
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - script: echo "TESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTING
+
+
+
+
+
+
+name: 'testingname'
+
 trigger:
 - master
+- feature/*
 
-resources:
-- repo: self
-
-variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '3d650e2f-60c2-4d0f-9bd0-4927698d554d'
-  imageRepository: 'swiphfbootcampappwithdocker'
-  containerRegistry: 'weighttracker.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: 'run_number_$(Build.BuildId)'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+pool:
+  vmImage: ubuntu-latest
 
 stages:
-- stage: Build
-  displayName: Build and push stage
+
+# Continuous Integration Process
+- stage: CI
   jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
+  - job: BuildAndPushDocker
+    workspace: 
+      clean: all
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -34,17 +83,33 @@ stages:
         tags: |
           $(tag)
 
-- stage: DeployToStaging
-  jobs:
-  - deployment: staging
-    displayName: Deploy to Staging
-    workspace:
-      clean: all
-    environment:
-      name: staging
-      resourceType: VirtualMachine
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - script: echo "TESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTINGTESTING
+# # Continuous Deployment Process for Staging Environment
+# - stage: DeployToStaging
+#   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+#   jobs:
+#   - deployment: staging
+#     displayName: Deploy to Staging
+#     environment:
+#       name: <<YOUR ENVIRONMENT NAME>>
+#       resourceType: VirtualMachine
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - <<YOUR TASKS>>
+          
+# # Continuous Delivery Process for Production Environment
+# - stage: DeployToProduction
+#   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+#   jobs:
+#   - deployment: production
+#     displayName: Deploy to Production
+#     environment:
+#       name: <<YOUR ENVIRONMENT NAME>>
+#       resourceType: VirtualMachine
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - <<YOUR TASKS>>
+
