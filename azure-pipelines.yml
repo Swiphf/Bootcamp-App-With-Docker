@@ -74,15 +74,24 @@ stages:
     workspace: 
       clean: all
     steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
+    - task: Docker@0
+      displayName: 'Build docker image'
       inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
+        dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+        action: Build an image
         dockerfile: $(dockerfilePath)
+        imageName: weighttracker.azurecr.io
+    - task: Docker@2
+      displayName: Login to Registry
+      inputs: 
         containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        command: login
+    - task: Docker@0
+      displayName: 'Push Docker Image'
+      inputs:
+        dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+        action: Push an image
+        imageName: weighttracker.azurecr.io
 
 # # Continuous Deployment Process for Staging Environment
 # - stage: DeployToStaging
