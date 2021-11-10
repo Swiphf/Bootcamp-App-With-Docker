@@ -10,7 +10,7 @@ variables:
   imageRepository: 'swiphfbootcampappwithdocker'
   containerRegistry: 'weighttracker.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag: 'run number $(Build.BuildId)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
