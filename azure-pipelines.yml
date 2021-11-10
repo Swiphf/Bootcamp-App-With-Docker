@@ -59,7 +59,7 @@ stages:
               containerRegistry: $(dockerRegistryServiceConnection)
               command: 'login'
 
-          # - task: CmdLine@2
-          #   displayName: Run New Container
-          #   inputs:
-          #     script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry).azurecr.io/weighttracker:$(tag)'
+          - task: CmdLine@2
+            displayName: Run New Container
+            inputs:
+              script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry)/weighttracker:$(tag)'
