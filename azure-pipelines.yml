@@ -62,8 +62,8 @@ trigger:
 - feature/*
 
 pool:
-  name: bootcamp-pool-week9
   vmImage: ubuntu-latest
+  name: bootcamp-pool-week9
 
 variables:
   # Container registry service connection established during pipeline creation
