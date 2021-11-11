@@ -60,9 +60,9 @@ stages:
               command: 'login'
 
           - task: CmdLine@2
-            displayName: Run New Container
+            displayName: Pull image
             inputs:
-              script: 'docker pull $(containerRegistry)/weighttrackerimage'
+              script: 'docker pull $(containerRegistry)/weighttrackerimage:$(tag)'
 
           - task: CmdLine@2
             displayName: Run New Container
