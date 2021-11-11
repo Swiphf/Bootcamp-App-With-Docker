@@ -6,15 +6,16 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '3d650e2f-60c2-4d0f-9bd0-4927698d554d'
-  imageRepository: 'swiphfbootcampappwithdocker'
-  containerRegistry: 'weighttracker.azurecr.io'
+  dockerRegistryServiceConnection: 'd02d66cb-c563-44a5-8b76-e7e1f0fa5511'
+  imageRepository: 'weighttrackerimage'
+  containerRegistry: 'containerregistryweek9.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
+# CI 
 stages:
 - stage: Build
   displayName: Build and push stage
@@ -22,7 +23,7 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      name: bootcamp-pool
+      name: bootcamp-pool-1
       vmImage: $(vmImageName)
     steps:
     - task: Docker@2
@@ -34,3 +35,36 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+# CD staging
+- stage: DeployToStaging
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: staging
+    displayName: Deploy to Staging
+    environment:
+      name: staging
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: CmdLine@2
+            displayName: Stop Current Container
+            inputs:
+              script: 'docker rm -f  weighttracker || true'
+          - task: Docker@2
+            displayName: 'Login to Registry'
+            inputs:
+              containerRegistry: $(dockerRegistryServiceConnection)
+              command: 'login'
+
+          - task: CmdLine@2
+            displayName: Pull image
+            inputs:
+              script: 'docker pull $(containerRegistry)/weighttrackerimage:$(tag)'
+
+          - task: CmdLine@2
+            displayName: Run New Container
+            inputs:
+              script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry)/weighttrackerimage:$(tag)'
