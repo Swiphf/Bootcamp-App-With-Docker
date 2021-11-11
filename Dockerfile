@@ -1,10 +1,9 @@
 # Base image
 FROM node:14-alpine
 
+RUN mkdir bootcamp-app
 RUN ls -la
-RUN pwd
-# RUN mkdir bootcamp-app
-WORKDIR /bootcamp-app
+# WORKDIR /bootcamp-app
 EXPOSE 8080
 
 # Install dependencies
