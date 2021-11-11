@@ -1,7 +1,8 @@
 # Base image
 FROM node:14-alpine
 
-RUN mkdir /home/bootcamp/bootcamp-app
+RUN cd /home/bootcamp/
+RUN mkdir bootcamp-app
 WORKDIR /bootcamp-app
 EXPOSE 8080
 
