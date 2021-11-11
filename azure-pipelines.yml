@@ -64,7 +64,7 @@ stages:
             inputs:
               script: 'docker pull $(containerRegistry)/weighttrackerimage:$(tag)'
 
-          # - task: CmdLine@2
-          #   displayName: Run New Container
-          #   inputs:
-          #     script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry)/weighttrackerimage:$(tag)'
+          - task: CmdLine@2
+            displayName: Run New Container
+            inputs:
+              script: 'docker run -d --name weighttracker -p 8080:8080 $(containerRegistry)/weighttrackerimage:$(tag)'
