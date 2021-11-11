@@ -64,7 +64,8 @@ stages:
             inputs:
               script: 'docker pull $(containerRegistry)/$(imageRepository):$(tag)'
 
-          - task: CmdLine@2
-            displayName: Run New Container
+          - task: Bash@3
+            displayName:  Run Container
             inputs:
-              script: 'docker run -d --name weighttracker -p 8080:8080 -e PG_HOST=$(PG_HOST) -e PORT=$(PORT) -e HOST=$(HOST) -e PG_USERNAME=$(PG_USERNAME) -e PG_DATABASE=postgres -e PG_PASSWORD=$(PG_PASSWORD) -e PG_PORT=$(PG_PORT) -e HOST_URL=$(HOST_URL) -e COOKIE_ENCRYPT_PWD=$(COOKIE_ENCRYPT_PWD) -e NODE_ENV=development -e OKTA_ORG_URL=$(OKTA_ORG_URL) -e OKTA_CLIENT_ID=$(OKTA_CLIENT_ID) -e OKTA_CLIENT_SECRET=$(OKTA_CLIENT_SECRET) $(containerRegistry)/$(imageRepository):$(tag)'
+              targetType: 'inline'
+              script: 'docker run -d --name weighttracker -p 8080:8080 -e PGHOST=$(PG_HOST) -e PORT=$(PORT) -e HOST=$(HOST) -e PGUSERNAME=$(PG_USERNAME) -e PGDATABASE=postgres -e PGPASSWORD=$(PG_PASSWORD) -e PGPORT=$(PG_PORT) -e HOST_URL=$(HOST_URL) -e COOKIE_ENCRYPT_PWD=$(COOKIE_ENCRYPT_PWD) -e NODE_ENV=development -e OKTA_ORG_URL=$(OKTA_ORG_URL) -e OKTA_CLIENT_ID=$(OKTA_CLIENT_ID) -e OKTA_CLIENT_SECRET=$(OKTA_CLIENT_SECRET) $(containerRegistry)/$(imageRepository):$(tag)'
