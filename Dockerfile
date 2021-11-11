@@ -1,11 +1,14 @@
 # Base image
 FROM node:14-alpine
 
-RUN mkdir bootcamp-app
+RUN mkdir -p /home/bootcamp/bootcamp-app
 RUN ls -la
-WORKDIR /bootcamp-app
+WORKDIR home/bootcamp/bootcamp-app
+COPY package*.json home/bootcamp/bootcamp-app
+RUN npm install 
+COPY . home/bootcamp/bootcamp-app
+
 EXPOSE 8080
 
 # Install dependencies
-RUN npm install 
-CMD npm run dev
+CMD ["npm", "run", "dev"]
