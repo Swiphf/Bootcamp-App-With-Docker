@@ -9,4 +9,5 @@ EXPOSE 8080
 RUN npm install 
 CMD npm run dev
 
+CMD cd /home/bootcamp/
 CMD echo testing > texting.txt
