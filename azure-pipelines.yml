@@ -6,14 +6,19 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'd02d66cb-c563-44a5-8b76-e7e1f0fa5511'
-  imageRepository: 'weighttrackerimage'
-  containerRegistry: 'containerregistryweek9.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  - group: production
+  - name: dockerRegistryServiceConnection
+    value: 'd02d66cb-c563-44a5-8b76-e7e1f0fa5511'
+  - name: imageRepository
+    value: 'weighttrackerimage'
+  - name: containerRegistry
+    value: 'containerregistryweek9.azurecr.io'
+  - name: dockerfilePath
+    value: '$(Build.SourcesDirectory)/Dockerfile'
+  - name: tag
+    value: '$(Build.BuildId)'
+  - name: vmImageName
+    value: 'ubuntu-latest'
 
 # CI 
 stages:
@@ -36,14 +41,48 @@ stages:
         tags: |
           $(tag)
 
-# CD staging
-- stage: DeployToStaging
+# # CD staging
+# - stage: DeployToStaging
+#   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+#   jobs:
+#   - deployment: staging
+#     displayName: Deploy to Staging
+#     environment:
+#       name: staging
+#       resourceType: VirtualMachine
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: CmdLine@2
+#             displayName: Stop Current Container
+#             inputs:
+#               script: 'docker rm -f  weighttracker || true'
+#           - task: Docker@2
+#             displayName: 'Login to Registry'
+#             inputs:
+#               containerRegistry: $(dockerRegistryServiceConnection)
+#               command: 'login'
+
+#           - task: CmdLine@2
+#             displayName: Pull image
+#             inputs:
+#               script: 'docker pull $(containerRegistry)/$(imageRepository):$(tag)'
+
+#           - task: Bash@3
+#             displayName:  Run Container
+#             inputs:
+#               targetType: 'inline'
+#               script: 'docker run -d --restart=always --name weighttracker -p 8080:8080 -e PGHOST=$(PG_HOST) -e PORT=$(PORT) -e HOST=$(HOST) -e PGUSERNAME=$(PG_USERNAME) -e PGDATABASE=postgres -e PGPASSWORD=$(PG_PASSWORD) -e PGPORT=$(PG_PORT) -e HOST_URL=$(HOST_URL) -e COOKIE_ENCRYPT_PWD=$(COOKIE_ENCRYPT_PWD) -e NODE_ENV=development -e OKTA_ORG_URL=$(OKTA_ORG_URL) -e OKTA_CLIENT_ID=$(OKTA_CLIENT_ID) -e OKTA_CLIENT_SECRET=$(OKTA_CLIENT_SECRET) $(containerRegistry)/$(imageRepository):$(tag)'
+
+# CD production
+- stage: DeployToProduction
   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
   jobs:
-  - deployment: staging
-    displayName: Deploy to Staging
+  - deployment: production
+    displayName: Deploy to Production
     environment:
-      name: staging
+      name: production
       resourceType: VirtualMachine
     strategy:
       runOnce:
@@ -69,3 +108,4 @@ stages:
             inputs:
               targetType: 'inline'
               script: 'docker run -d --restart=always --name weighttracker -p 8080:8080 -e PGHOST=$(PG_HOST) -e PORT=$(PORT) -e HOST=$(HOST) -e PGUSERNAME=$(PG_USERNAME) -e PGDATABASE=postgres -e PGPASSWORD=$(PG_PASSWORD) -e PGPORT=$(PG_PORT) -e HOST_URL=$(HOST_URL) -e COOKIE_ENCRYPT_PWD=$(COOKIE_ENCRYPT_PWD) -e NODE_ENV=development -e OKTA_ORG_URL=$(OKTA_ORG_URL) -e OKTA_CLIENT_ID=$(OKTA_CLIENT_ID) -e OKTA_CLIENT_SECRET=$(OKTA_CLIENT_SECRET) $(containerRegistry)/$(imageRepository):$(tag)'
+
